@@ -5,3 +5,4 @@ SpenveShader/Logs
 SpenveShader/.idea
 *.sln
 
+*.csproj
