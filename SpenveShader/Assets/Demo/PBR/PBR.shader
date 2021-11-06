@@ -3,8 +3,8 @@ Shader "Spenve/PBR"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _Roughness("Roughness", float) = 1
-        _Metal("Metal", float) = 0
+        _Roughness("Roughness", Range(0, 1)) = 1
+        _Metal("Metal", Range(0, 1)) = 0
     }
     SubShader
     {
@@ -65,15 +65,18 @@ Shader "Spenve/PBR"
                 return x * x * x * x * x;
             }
             
+            float GGX(float dotxx, float k)
+            {
+                return dotxx / (dotxx * (1 - k) + k);
+            }
+            
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
                 
-                float pi = 3.1415926;
-
                 //base,漫反射部分，迪斯尼计算公式
-                col /= pi;
+                col /= UNITY_PI;
                 
                 //half
                 float3 normal = normalize(i.normal);
@@ -81,24 +84,25 @@ Shader "Spenve/PBR"
                 float3 lightDir = normalize(_WorldSpaceLightPos0);
                 float3 hf = normalize(viewDir + lightDir);
                 
-                float dotNH = ( dot(normal, hf));
+                float dotNH = max(dot(normal, hf), 0);
                 float dotHL = ( dot(lightDir, hf) );
                 //float fd90 = 0.5 + 2 * _Roughness * pow2(dotHL);
 
-                float dotNL = (dot(normal, lightDir));
+                float dotNL = max(dot(normal, lightDir), 0);
                 //float nv = 1 + (fd90 - 1) * pow5( 1 - dotNL);
-                float dotNV = (dot(normal, viewDir));
+                float dotNV = max(dot(normal, viewDir), 0);
                 //float nl = 1 + (fd90 - 1) * pow5( 1 - dotNV);
                 
                 float denomitor = 4 * dotNV * dotNL;
                 
                 float pow2Roughness = pow2(_Roughness);
-                float D = pow2Roughness / (pi * pow2(pow2(dotNH) * (pow2Roughness - 1) + 1));
+                float denom = UNITY_PI * pow2(pow2(dotNH) * (pow2Roughness - 1) + 1);
+                float D = pow2Roughness / denom;
                 
                 float k = pow2(_Roughness + 1) / 8;
-                float G = dotNL * dotNV / (lerp(dotNL, 1, k) * lerp(dotNV, 1, k));
+                float G = GGX(dotNV, k) * GGX(dotNL, k);
                 
-                float f0 = lerp(fixed3(0.04, 0.04, 0.04), col, _Metal);
+                fixed3 f0 = lerp(fixed3(0.56, 0.57, 0.58), col, _Metal);
                 float F = lerp(pow5( 1 - dotNV), 1, f0);
                 
                 col += D * G * F / denomitor;
