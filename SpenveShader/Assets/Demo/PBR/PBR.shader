@@ -86,30 +86,32 @@ Shader "Spenve/PBR"
                 
                 float dotNH = max(dot(normal, hf), 0);
                 float dotHL = ( dot(lightDir, hf) );
-                //float fd90 = 0.5 + 2 * _Roughness * pow2(dotHL);
 
                 float dotNL = max(dot(normal, lightDir), 0);
-                //float nv = 1 + (fd90 - 1) * pow5( 1 - dotNL);
                 float dotNV = max(dot(normal, viewDir), 0);
-                //float nl = 1 + (fd90 - 1) * pow5( 1 - dotNV);
                 
+                //分母
                 float denomitor = 4 * dotNV * dotNL;
                 
+                //法线分布
                 float pow2Roughness = pow2(_Roughness);
                 float denom = UNITY_PI * pow2(pow2(dotNH) * (pow2Roughness - 1) + 1);
                 float D = pow2Roughness / denom;
                 
+                //阴影遮罩
                 float k = pow2(_Roughness + 1) / 8;
                 float G = GGX(dotNV, k) * GGX(dotNL, k);
                 
+                //菲尼尔
                 fixed3 f0 = lerp(fixed3(0.56, 0.57, 0.58), col, _Metal);
                 float F = lerp(pow5( 1 - dotNV), 1, f0);
                 
                 col += D * G * F / denomitor;
                 
-                //col *= nv * nl;
+                //漫反射
                 col *= _LightColor0 * dotNL;
  
+                //雾
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 
                 return col;
