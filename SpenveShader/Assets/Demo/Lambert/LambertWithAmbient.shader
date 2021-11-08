@@ -67,16 +67,15 @@ Shader "Spenve/LambertWithAmbient"
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
                 
-                //光照
-                col *= i.color;
-                
-                //阴影
+                //光照和阴影
                 fixed shadow = SHADOW_ATTENUATION(i);
-                col *= shadow;
+                fixed4 light = i.color * shadow;
                 
                 //环境光
-                col.rgb += ShadeSH9(half4(i.normal, 1));
+                light.rgb += ShadeSH9(half4(i.normal, 1));
 
+                col *= light;
+                
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 
