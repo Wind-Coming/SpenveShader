@@ -35,6 +35,7 @@ Shader "Spenve/LambertWithAmbient"
                 float2 uv : TEXCOORD0;
                 float4 pos : SV_POSITION;
                 float4 color : COLOR;
+                float3 normal : NORMAL;
                 SHADOW_COORDS(1)
                 UNITY_FOG_COORDS(2)
            };
@@ -50,10 +51,11 @@ Shader "Spenve/LambertWithAmbient"
                 //float3 normal = UnityObjectToWorldNormal(v.normal);
                 //float3 normal = mul(v.normal, (float3x3)unity_WorldToObject); 
                 float3 normal = mul(unity_ObjectToWorld, v.normal);
+                o.normal = normal;
                 
                 float h = max(0, dot(v.normal, normalize(_WorldSpaceLightPos0)));
                 o.color = _LightColor0 * h;
-                o.color.rgb += ShadeSH9(half4(normal, 1));
+                //o.color.rgb += ShadeSH9(half4(normal, 1));
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 TRANSFER_SHADOW(o)
@@ -64,12 +66,21 @@ Shader "Spenve/LambertWithAmbient"
             {
                 // sample the texture
                 fixed4 col = tex2D(_MainTex, i.uv);
+                
+                //光照
+                col *= i.color;
+                
+                //阴影
                 fixed shadow = SHADOW_ATTENUATION(i);
                 col *= shadow;
                 
+                //环境光
+                col.rgb += ShadeSH9(half4(i.normal, 1));
+
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
-                return col * i.color;
+                
+                return col;
             }
             ENDCG
         }
