@@ -3,6 +3,7 @@ Shader "Spenve/PBR"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _MetalTex ("Metal", 2D) = "white" {}
         _Roughness("Roughness", Range(0, 1)) = 1
         _Metal("Metal", Range(0, 1)) = 0
     }
@@ -40,6 +41,7 @@ Shader "Spenve/PBR"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            sampler2D _MetalTex;
             float _Roughness;
             float _Metal;
 
@@ -76,7 +78,7 @@ Shader "Spenve/PBR"
                 fixed4 col = tex2D(_MainTex, i.uv);
                 
                 //base,漫反射部分，迪斯尼计算公式
-                col /= UNITY_PI;
+                col = col * (1 - _Metal) / UNITY_PI;
                 
                 //half
                 float3 normal = normalize(i.normal);
@@ -104,9 +106,9 @@ Shader "Spenve/PBR"
                 
                 //菲尼尔
                 fixed3 f0 = lerp(fixed3(0.56, 0.57, 0.58), col, _Metal);
-                float F = lerp(pow5( 1 - dotNV), 1, f0);
+                fixed3 F = f0 + (1 - f0) * pow5(1 - dotNV);// lerp(pow5( 1 - dotNV), 1, f0);
                 
-                col += D * G * F / denomitor;
+                col.rgb += D * G * F / denomitor;
                 
                 //漫反射
                 col *= _LightColor0 * dotNL;
