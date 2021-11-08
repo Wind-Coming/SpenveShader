@@ -6,3 +6,4 @@ SpenveShader/.idea
 *.sln
 
 *.csproj
+*.cache
