@@ -191,13 +191,14 @@ Shader "Spenve/PBR"
             {
                 float2 uv : TEXCOORD0;
 				half4 ambientOrLightmapUV : TEXCOORD1;//存储环境光或光照贴图的UV坐标
-                UNITY_FOG_COORDS(4)
-                float4 vertex : SV_POSITION;
+                UNITY_FOG_COORDS(6)
+                float4 pos : SV_POSITION;
                 float3 worldPos : TEXCOORD2;
                 float3 normal : NORMAL;
                 half3 tspace0 : TEXCOORD3;
                 half3 tspace1 : TEXCOORD4;
                 half3 tspace2 : TEXCOORD5;            
+				SHADOW_COORDS(7) //定义阴影所需要的变量，定义在AutoLight.cginc
             };
 
             sampler2D _MainTex;
@@ -210,7 +211,7 @@ Shader "Spenve/PBR"
             v2f vert (appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.pos = UnityObjectToClipPos(v.vertex);
                 o.normal = UnityObjectToWorldNormal(v.normal);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex); 
                 
@@ -225,7 +226,9 @@ Shader "Spenve/PBR"
                 o.tspace2 = half3(wTangent.z, wBitangent.z, o.normal.z);
                 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
+				//填充阴影所需要的参数,定义在AutoLight.cginc
+				TRANSFER_SHADOW(o);
+                UNITY_TRANSFER_FOG(o,o.pos);
                 return o;
             }
 
@@ -273,15 +276,16 @@ Shader "Spenve/PBR"
                 //metal = 1时，f0 = albedo(贴图里为白色，可以理解为金属反色光), F为白色，此时spcular靠其他两位D和G支撑，这也应证了金属受菲尼尔影响较小。
                 //metal = 0时，f0 = 0.04，F就中间黑，边缘白（球体是这样），此时中间的specular就取决于光泽度了
                 fixed3 f0 = lerp(unity_ColorSpaceDielectricSpec.rgb, albedo.rgb, metal);//反射率
-                fixed3 F = f0 + (1 - f0) * pow5(1 - dotHL);//这里unity用的是HL，略为不解
+                fixed3 F = unity_ColorSpaceDielectricSpec.rgb;//f0 + (1 - f0) * pow5(1 - dotHL);//这后面是unity原来用的方法，略为不解，难道是为了通透？
                 
                 //漫反射
                 col.rgb *= (1 - F) * (1 - metal) / UNITY_PI;
                 
                 col.rgb += D * G * F / denomitor;
                 
+				UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);//计算阴影和衰减,定义在AutoLight.cginc
                 //漫反射
-                col *= UNITY_PI * _LightColor0 * dotNL;
+                col *= UNITY_PI * _LightColor0 * dotNL * atten;
                 
                 
                 //镜面反射
