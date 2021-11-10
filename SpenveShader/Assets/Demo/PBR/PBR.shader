@@ -3,6 +3,7 @@ Shader "Spenve/PBR"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
+        _BumpMap("Normal Map", 2D) = "bump" {}
         _MetalTex ("Metal", 2D) = "white" {}
         _Smoothness("Smoothness", Range(0, 1)) = 1
         _Metal("Metal", Range(0, 1)) = 0
@@ -170,6 +171,7 @@ Shader "Spenve/PBR"
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
                 float3 normal : NORMAL;
+                float4 tangent : TANGENT;
  				float2 texcoord1 : TEXCOORD1;
 				float2 texcoord2 : TEXCOORD2;
            };
@@ -181,11 +183,15 @@ Shader "Spenve/PBR"
                 UNITY_FOG_COORDS(4)
                 float4 vertex : SV_POSITION;
                 float3 worldPos : TEXCOORD2;
-                float3 normal : TEXCOORD3;
+                float3 normal : NORMAL;
+                half3 tspace0 : TEXCOORD3;
+                half3 tspace1 : TEXCOORD4;
+                half3 tspace2 : TEXCOORD5;            
             };
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
+            sampler2D _BumpMap;
             sampler2D _MetalTex;
             float _Smoothness;
             float _Metal;
@@ -200,6 +206,13 @@ Shader "Spenve/PBR"
 				//计算环境光照或光照贴图uv坐标
 				o.ambientOrLightmapUV = VertexGI(v.texcoord1,v.texcoord2, o.worldPos, o.normal);
 				
+				half3 wTangent = UnityObjectToWorldDir(v.tangent.xyz);
+                half tangentSign = v.tangent.w * unity_WorldTransformParams.w;
+                half3 wBitangent = cross(o.normal, wTangent) * tangentSign;
+                o.tspace0 = half3(wTangent.x, wBitangent.x, o.normal.x);
+                o.tspace1 = half3(wTangent.y, wBitangent.y, o.normal.y);
+                o.tspace2 = half3(wTangent.z, wBitangent.z, o.normal.z);
+                
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o,o.vertex);
                 return o;
@@ -215,8 +228,14 @@ Shader "Spenve/PBR"
                 fixed metal = _Metal * metalCol.r;
                 fixed roughness = 1 - _Smoothness * metalCol.a;
                                 
+                //normal
+                half3 tnormal = UnpackNormal(tex2D(_BumpMap, i.uv));
+                half3 normal;
+                normal.x = dot(i.tspace0, tnormal);
+                normal.y = dot(i.tspace1, tnormal);
+                normal.z = dot(i.tspace2, tnormal);
+                
                 //half
-                float3 normal = normalize(i.normal);
                 float3 viewDir = normalize( _WorldSpaceCameraPos - i.worldPos );
                 float3 lightDir = normalize(_WorldSpaceLightPos0);
                 float3 hf = normalize(viewDir + lightDir);
