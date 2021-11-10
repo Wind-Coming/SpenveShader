@@ -4,7 +4,7 @@ Shader "Spenve/PBR"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _BumpMap("Normal Map", 2D) = "bump" {}
-        _MetalTex ("Metal", 2D) = "white" {}
+        _MetalTex ("Metal", 2D) = "white" {}//r 金属 a粗糙度  可以合并到其他贴图
         _Smoothness("Smoothness", Range(0, 1)) = 1
         _Metal("Metal", Range(0, 1)) = 0
     }
