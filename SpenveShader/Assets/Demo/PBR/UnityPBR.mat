@@ -8,8 +8,8 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: UnityPBR
-  m_Shader: {fileID: 4800000, guid: cfd2a5e150e7c43f08804533e8a688ee, type: 3}
-  m_ShaderKeywords: _METALLICGLOSSMAP _SPECGLOSSMAP
+  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_ShaderKeywords: _METALLICGLOSSMAP _NORMALMAP _SPECGLOSSMAP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: 37fb20c3a7dad4d11ad8cc0890a46146, type: 3}
+        m_Texture: {fileID: 2800000, guid: a76ed0c78df704945ba9fe058366538c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: ea58a5b8cde54463abf0d349d5e2467f, type: 3}
+        m_Texture: {fileID: 2800000, guid: 26d21a7ad39f446b58975edf5df916a0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetalicTex:
@@ -48,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: f51d142ecfb3947849bf47ee5bc7c630, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9927bf92b572046608d9525602a4d7d8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalTex:

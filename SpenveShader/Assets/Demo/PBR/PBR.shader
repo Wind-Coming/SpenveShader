@@ -273,7 +273,7 @@ Shader "Spenve/PBR"
                 //metal = 1时，f0 = albedo(贴图里为白色，可以理解为金属反色光), F为白色，此时spcular靠其他两位D和G支撑，这也应证了金属受菲尼尔影响较小。
                 //metal = 0时，f0 = 0.04，F就中间黑，边缘白（球体是这样），此时中间的specular就取决于光泽度了
                 fixed3 f0 = lerp(unity_ColorSpaceDielectricSpec.rgb, albedo.rgb, metal);//反射率
-                fixed3 F = f0 + (1 - f0) * pow5(1 - dotNV);
+                fixed3 F = f0 + (1 - f0) * pow5(1 - dotHL);//这里unity用的是HL，略为不解
                 
                 //漫反射
                 col.rgb *= (1 - F) * (1 - metal) / UNITY_PI;
@@ -290,8 +290,10 @@ Shader "Spenve/PBR"
                 
                 //f0的反射率
 				half oneMinusReflectivity = (1- metal) * unity_ColorSpaceDielectricSpec.a;
+				//计算掠射角时反射率
+				half grazingTerm = saturate((1 - roughness) + (1-oneMinusReflectivity));
 				//计算间接光镜面反射
-				indirectSpecular *= F;
+				indirectSpecular *= f0 + grazingTerm * pow5(1 - dotNV);;
 
 				//计算环境光
 				half3 indirectDiffuse = ComputeIndirectDiffuse(i.ambientOrLightmapUV, 1);
