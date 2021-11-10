@@ -166,6 +166,17 @@ Shader "Spenve/PBR"
                 return lerp(c0,c1,t);
             }
 
+            //inline half OneMinusReflectivityFromMetallic(half metallic)
+            //{
+                // We'll need oneMinusReflectivity, so
+                //   1-reflectivity = 1-lerp(dielectricSpec, 1, metallic) = lerp(1-dielectricSpec, 0, metallic)
+                // store (1-dielectricSpec) in unity_ColorSpaceDielectricSpec.a, then
+                //   1-reflectivity = lerp(alpha, 0, metallic) = alpha + metallic*(0 - alpha) =
+                //                  = alpha - metallic * alpha
+            //    half oneMinusDielectricSpec = unity_ColorSpaceDielectricSpec.a;
+            //    return oneMinusDielectricSpec - metallic * oneMinusDielectricSpec;
+            //}
+            
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -276,14 +287,13 @@ Shader "Spenve/PBR"
                 //镜面反射
  				half3 refDir = reflect(-viewDir, normal);//世界空间下的反射方向
                 fixed3 indirectSpecular = ComputeIndirectSpecular(refDir, i.worldPos, roughness, 1);//镜面反射,1 需要换成ao
+                
                 //f0的反射率
 				half oneMinusReflectivity = (1- metal) * unity_ColorSpaceDielectricSpec.a;
-				//计算掠射角时反射率
-				half grazingTerm = saturate((1 - roughness) + (1-oneMinusReflectivity));
 				//计算间接光镜面反射
-				indirectSpecular *= ComputeFresnelLerp(f0, grazingTerm, dotNV);
+				indirectSpecular *= F;
 
-				//计算间接光
+				//计算环境光
 				half3 indirectDiffuse = ComputeIndirectDiffuse(i.ambientOrLightmapUV, 1);
 				indirectDiffuse *= albedo * oneMinusReflectivity;
 
