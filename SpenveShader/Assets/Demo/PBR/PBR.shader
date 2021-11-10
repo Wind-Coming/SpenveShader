@@ -308,4 +308,5 @@ Shader "Spenve/PBR"
             ENDCG
         }
     }
+	FallBack "VertexLit"
 }
