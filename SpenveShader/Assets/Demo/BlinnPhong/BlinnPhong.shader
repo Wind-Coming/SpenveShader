@@ -64,11 +64,11 @@ Shader "Spenve/BlinnPhong"
                 
                 float3 lookdir = normalize( _WorldSpaceCameraPos - i.worldPos );
                 float3 lightDir = normalize(_WorldSpaceLightPos0);
-                float3 half = normalize(lookdir + lightDir);
+                float3 hf = normalize(lookdir + lightDir);
                 
                 col *= _LightColor0 * max(0, dot(i.normal, lightDir));
                 
-                col += pow( max(0, dot(half, i.normal)), _Gloss);
+                col += pow( max(0, dot(hf, i.normal)), _Gloss);
 
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
