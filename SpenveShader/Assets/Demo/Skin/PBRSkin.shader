@@ -240,7 +240,7 @@ Shader "Spenve/PBRSkin"
             {
                 // sample the texture
                 fixed4 albedo = tex2D(_MainTex, i.uv);
-                fixed4 col = albedo;
+                fixed3 col = albedo;
                 
                 fixed4 metalCol = tex2D(_MetalTex, i.uv);
                 fixed metal = _Metal * metalCol.r;
@@ -284,9 +284,9 @@ Shader "Spenve/PBRSkin"
                 fixed3 F = unity_ColorSpaceDielectricSpec.rgb;//f0 + (1 - f0) * pow5(1 - dotHL);//这后面是unity原来用的方法，略为不解，难道是为了通透？
                 
                 //漫反射
-                col.rgb *= (1 - F) * (1 - metal) / UNITY_PI;
+                col *= (1 - F) * (1 - metal) / UNITY_PI;
                 
-                col.rgb += D * G * F / denomitor;
+                col += D * G * F / denomitor;
                 
 				UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);//计算阴影和衰减,定义在AutoLight.cginc
 				
@@ -297,9 +297,12 @@ Shader "Spenve/PBRSkin"
                 
                 float4 uv = float4(dotNLA * 0.5 + 0.5, curve, 0, 0);
                 fixed4 lutCol = tex2Dlod(_Lut, uv);
+                
+                //transparent skin
+                float trans = pow(saturate(-dot(lightDir, viewDir)), 10) * albedo.a;//(1 - dot(lightDir, viewDir)) * albedo.a;
 
                 //漫反射
-                col *= UNITY_PI * _LightColor0 * lutCol * atten;
+                col *= UNITY_PI * _LightColor0 * lutCol * atten + trans * fixed3(1, 0, 0);
                 
                 //镜面反射
  				half3 refDir = reflect(-viewDir, normal);//世界空间下的反射方向
@@ -316,13 +319,13 @@ Shader "Spenve/PBRSkin"
 				half3 indirectDiffuse = ComputeIndirectDiffuse(i.ambientOrLightmapUV, 1);
 				indirectDiffuse *= albedo * oneMinusReflectivity;
 
-                col.rgb += indirectDiffuse;
-                col.rgb += indirectSpecular;
+                col += indirectDiffuse;
+                col += indirectSpecular;
  
                 //雾
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 
-                return fixed4(col.rgb, 1);
+                return fixed4(col, 1);
             }
             ENDCG
         }
