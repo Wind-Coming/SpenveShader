@@ -405,12 +405,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1903993084}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e25c84ab3255343478e16528fa1d5d45, type: 3}
+  m_Script: {fileID: 11500000, guid: 3b92f92112ca44acfa98ba7099f78647, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mat: {fileID: 2100000, guid: b032978a68adb4789ae604dd03b3a760, type: 2}
+  mat: {fileID: 2100000, guid: 3d1afcd645b9344b4923bee9ad60b997, type: 2}
   blurRadius: 2
-  luminanceThreshold: 0
-  intensity: 2
-  downIteration: 3
-  upIteration: 3
+  downIteration: 2
+  upIteration: 2
