@@ -1,4 +1,4 @@
-Shader "Spenve/Post/ParticleBlur"
+Shader "Spenve/Post/GrainyBlur"
 {
     Properties
     {
