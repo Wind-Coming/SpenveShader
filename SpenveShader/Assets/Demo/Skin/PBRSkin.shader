@@ -290,7 +290,7 @@ Shader "Spenve/PBRSkin"
                 
 				UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);//计算阴影和衰减,定义在AutoLight.cginc
 				
-				//皮肤着色
+				//皮肤着色，硬边可以通过将曲率烘焙到顶点颜色里或者贴图里
 				float nwidth = length(fwidth(normal));
                 float pwidth = length(fwidth(i.worldPos));
                 float curve = _LutFactor * nwidth / pwidth;
