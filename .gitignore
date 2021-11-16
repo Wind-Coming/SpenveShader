@@ -4,6 +4,7 @@ SpenveShader/Temp
 SpenveShader/Logs
 SpenveShader/.idea
 *.sln
+*.DS_Store
 
 *.csproj
 *.cache
