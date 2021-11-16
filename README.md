@@ -12,4 +12,4 @@ Bloom（模糊部分使用双重模糊，三星s8渲染时间1ms以内）
 Cartoon  
 常用特效功能集锦（滚动，溶解，扭曲，遮罩，菲尼尔，ParticleSystem可控shader参数）
 一种挖洞的实现方式  
-![Image text](https://github.com/Wind-Coming/SpenveShader/ScreenShot/hole.png)
+![Image text](https://github.com/Wind-Coming/SpenveShader/blob/main/ScreenShot/hole.png)
