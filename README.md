@@ -1,6 +1,6 @@
 # SpenveShader
 
-shader集锦
+#shader集锦
 Lambert光照模型
 Blinnphone光照模型
 PBR
