@@ -8,7 +8,7 @@ PBR
 
 PBR 皮肤（Pre-Integrated Skin Rendering）  
 ![Image text](https://github.com/Wind-Coming/SpenveShader/blob/main/ScreenShot/PBRSkin.png)  
-![Image text](https://github.com/Wind-Coming/SpenveShader/blob/main/ScreenShot/PBRSKin2.png)  
+![Image text](https://github.com/Wind-Coming/SpenveShader/blob/main/ScreenShot/PBRSkin2.png)  
 
 PlaneReflection  
 ![Image text](https://github.com/Wind-Coming/SpenveShader/blob/main/ScreenShot/PlaneReflection.png)  
